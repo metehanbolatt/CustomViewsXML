@@ -15,9 +15,9 @@ class OTPViewCustom @JvmOverloads constructor(
     attrs: AttributeSet? = null
 ) : AppCompatEditText(context, attrs) {
 
-    private var spaceBetweenCircles = 24f
+    private var spaceBetweenCircles = 32f
     private var numberOfCircle = 6f
-    private var numberOfLine = 6
+    private var numberOfLine = 5f
     private var clickListener: OnClickListener? = null
 
     private var onInputDigitsListener: ((String) -> Unit)? = null
@@ -81,11 +81,9 @@ class OTPViewCustom @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas?) {
-        val availableWidth = width - paddingRight - paddingLeft
         var startX = 2f
         val bottom = height.toFloat()
-
-        val circleSize = height / 8f
+        val circleSize = height / 7f
 
         canvas?.drawRoundRect(
             0f,
@@ -107,28 +105,33 @@ class OTPViewCustom @JvmOverloads constructor(
             otpBackgroundStrokePaint
         )
 
-        (1 until numberOfLine).forEach {
-            val middle = startX + circleSize
-            canvas?.drawLine(
-                middle * it * 2,
-                circleSize * 2.5f,
-                middle * it * 2,
-                height - circleSize * 2.5f,
-                linePaint
-            )
-        }
-
         (0 until numberOfCircle.toInt()).forEach {
             val middleOfCircle = startX + circleSize
+            val bet = (circleSize + spaceBetweenCircles).toInt()
+
+            val defaultLeftPadding =
+                (width - ((numberOfLine * bet / 2) + circleSize * 2 * numberOfCircle)) / 2
+
             canvas?.drawCircle(
-                middleOfCircle,
+                defaultLeftPadding + middleOfCircle,
                 bottom / 2,
                 circleSize,
                 emptyCirclePaint!!
             )
+
+            if (it != numberOfCircle.toInt() - 1) {
+                canvas?.drawLine(
+                    defaultLeftPadding + middleOfCircle + circleSize + bet / 4,
+                    circleSize * 2.2f,
+                    defaultLeftPadding + middleOfCircle + circleSize + bet / 4,
+                    height - circleSize * 2.2f,
+                    linePaint
+                )
+            }
+
             if (isFocused && it == text!!.length) {
                 canvas?.drawCircle(
-                    middleOfCircle,
+                    defaultLeftPadding + middleOfCircle,
                     bottom / 2,
                     circleSize,
                     emptyCirclePaint!!
@@ -136,13 +139,13 @@ class OTPViewCustom @JvmOverloads constructor(
             }
             if (text!!.length > it) {
                 canvas?.drawCircle(
-                    middleOfCircle,
+                    defaultLeftPadding + middleOfCircle,
                     bottom / 2,
                     circleSize,
                     filledCirclePaint!!
                 )
             }
-            startX += (circleSize + spaceBetweenCircles).toInt()
+            startX += bet
         }
     }
 
