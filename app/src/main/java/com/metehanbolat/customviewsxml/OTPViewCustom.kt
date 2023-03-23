@@ -82,10 +82,10 @@ class OTPViewCustom @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas?) {
         val availableWidth = width - paddingRight - paddingLeft
-        val mCharSize: Float =
-            (availableWidth - spaceBetweenCircles * (numberOfCircle - 1)) / numberOfCircle
-        var startX = paddingLeft
+        var startX = 2f
         val bottom = height.toFloat()
+
+        val circleSize = height / 8f
 
         canvas?.drawRoundRect(
             0f,
@@ -108,29 +108,29 @@ class OTPViewCustom @JvmOverloads constructor(
         )
 
         (1 until numberOfLine).forEach {
-            val middle = startX + mCharSize / 2
+            val middle = startX + circleSize
             canvas?.drawLine(
                 middle * it * 2,
-                middle,
+                circleSize * 2.5f,
                 middle * it * 2,
-                height - middle,
+                height - circleSize * 2.5f,
                 linePaint
             )
         }
 
         (0 until numberOfCircle.toInt()).forEach {
-            val middleOfCircle = startX + mCharSize / 2
+            val middleOfCircle = startX + circleSize
             canvas?.drawCircle(
                 middleOfCircle,
                 bottom / 2,
-                mCharSize / 6,
+                circleSize,
                 emptyCirclePaint!!
             )
             if (isFocused && it == text!!.length) {
                 canvas?.drawCircle(
                     middleOfCircle,
                     bottom / 2,
-                    mCharSize / 6,
+                    circleSize,
                     emptyCirclePaint!!
                 )
             }
@@ -138,11 +138,11 @@ class OTPViewCustom @JvmOverloads constructor(
                 canvas?.drawCircle(
                     middleOfCircle,
                     bottom / 2,
-                    mCharSize / 6,
+                    circleSize,
                     filledCirclePaint!!
                 )
             }
-            startX += (mCharSize + spaceBetweenCircles / 3).toInt()
+            startX += (circleSize + spaceBetweenCircles).toInt()
         }
     }
 
