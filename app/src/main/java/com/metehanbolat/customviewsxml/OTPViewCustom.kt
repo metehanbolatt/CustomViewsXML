@@ -15,9 +15,8 @@ class OTPViewCustom @JvmOverloads constructor(
     attrs: AttributeSet? = null
 ) : AppCompatEditText(context, attrs) {
 
-    private var spaceBetweenCircles = 32f
+    private var spaceBetweenCircles = 36f
     private var numberOfCircle = 6f
-    private var numberOfLine = 5f
     private var clickListener: OnClickListener? = null
 
     private var onInputDigitsListener: ((String) -> Unit)? = null
@@ -39,7 +38,7 @@ class OTPViewCustom @JvmOverloads constructor(
         color = ContextCompat.getColor(context, R.color.white)
     }
 
-    private var otpBackgroundStrokePaint: Paint = Paint().apply {
+    private var otpBackgroundStrokePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeWidth = 2f
     }
@@ -72,7 +71,7 @@ class OTPViewCustom @JvmOverloads constructor(
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        val minHeight = (50 * resources.displayMetrics.density).toInt()
+        val minHeight = (60 * resources.displayMetrics.density).toInt()
         setMeasuredDimension(measuredWidth, maxOf(minHeight, measuredHeight))
     }
 
@@ -81,15 +80,14 @@ class OTPViewCustom @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas?) {
-        var startX = 2f
-        val bottom = height.toFloat()
-        val circleSize = height / 7f
+        val measuredHeightF = measuredHeight.toFloat()
+        val measuredWidthF = measuredWidth.toFloat()
 
         canvas?.drawRoundRect(
             0f,
             0f,
-            width.toFloat(),
-            bottom,
+            measuredWidthF,
+            measuredHeightF,
             15f,
             15f,
             otpBackgroundPaint
@@ -98,34 +96,32 @@ class OTPViewCustom @JvmOverloads constructor(
         canvas?.drawRoundRect(
             1f,
             1f,
-            width.toFloat(),
-            height.toFloat(),
+            measuredWidthF - 1f,
+            measuredHeightF - 1f,
             15f,
             15f,
             otpBackgroundStrokePaint
         )
 
         (0 until numberOfCircle.toInt()).forEach {
-            val middleOfCircle = startX + circleSize
-            val bet = (circleSize + spaceBetweenCircles).toInt()
-            val defaultLeftPadding =
-                (width - ((numberOfLine * bet / 2) + circleSize * 2 * numberOfCircle)) / 2
-
-            val circlePosition = defaultLeftPadding + middleOfCircle - 40f
+            val circleSize = (measuredHeight / 2.8f) / resources.displayMetrics.density
+            val bet = circleSize + spaceBetweenCircles
+            val defaultLeftPadding = (measuredWidth - ((numberOfCircle - 1) * circleSize) - ((numberOfCircle - 1) * spaceBetweenCircles)) / 2
+            val circlePosition = (defaultLeftPadding + (it * bet))
 
             canvas?.drawCircle(
                 circlePosition,
-                bottom / 2,
+                measuredHeightF / 2,
                 circleSize,
                 emptyCirclePaint!!
             )
 
             if (it != numberOfCircle.toInt() - 1) {
                 canvas?.drawLine(
-                    defaultLeftPadding + middleOfCircle + bet / 7,
-                    circleSize * 2.2f,
-                    defaultLeftPadding + middleOfCircle + bet / 7,
-                    height - circleSize * 2.2f,
+                    defaultLeftPadding + circleSize / 2 + (spaceBetweenCircles / 2) + (it * (spaceBetweenCircles + circleSize)),
+                    measuredHeight / 3.5f,
+                    defaultLeftPadding + circleSize / 2 + (spaceBetweenCircles / 2) + (it * (spaceBetweenCircles + circleSize)),
+                    measuredHeight - (measuredHeight / 3.5f),
                     linePaint
                 )
             }
@@ -133,7 +129,7 @@ class OTPViewCustom @JvmOverloads constructor(
             if (isFocused && it == text!!.length) {
                 canvas?.drawCircle(
                     circlePosition,
-                    bottom / 2,
+                    measuredHeightF / 2,
                     circleSize,
                     emptyCirclePaint!!
                 )
@@ -141,12 +137,11 @@ class OTPViewCustom @JvmOverloads constructor(
             if (text!!.length > it) {
                 canvas?.drawCircle(
                     circlePosition,
-                    bottom / 2,
+                    measuredHeightF / 2,
                     circleSize,
                     filledCirclePaint!!
                 )
             }
-            startX += bet
         }
     }
 
